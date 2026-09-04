@@ -1,0 +1,14 @@
+{
+  "name": "chaea-invoice-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "채아힐링센터 송장 안내 메시지 생성기 (우체국 / GS Postbox / CU택배)",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node tests/run-tests.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
