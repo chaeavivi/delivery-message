@@ -76,10 +76,16 @@
             <span class="field__label">고객명 <em>선택</em></span>
             <input id="customer" class="field__input" type="text" placeholder="예) 김채아" />
           </label>
-          <label class="field">
-            <span class="field__label">상품명 <em>선택</em></span>
-            <input id="product" class="field__input" type="text" placeholder="예) 힐링 아로마 세트" />
-          </label>
+          <div class="field field--wide">
+            <label class="field__label" for="product">상품명 <em>선택</em></label>
+            <div class="products" id="products"></div>
+            <input
+              id="product"
+              class="field__input"
+              type="text"
+              placeholder="위에서 고르거나 직접 적어주세요"
+            />
+          </div>
           <label class="field">
             <span class="field__label">발송일</span>
             <input id="ship-date" class="field__input" type="date" />

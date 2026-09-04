@@ -11,6 +11,7 @@ import {
 } from './businessDays.js';
 import { digitsOnly, extractCandidates, formatInvoice, validateInvoice } from './invoice.js';
 import { DEFAULT_TEMPLATE, PLACEHOLDERS, buildValues, renderTemplate } from './message.js';
+import { PRODUCT_GROUPS, isSelected, toggleProduct } from './products.js';
 import { recognizeNumbers } from './ocr.js';
 
 const STORAGE = {
@@ -35,6 +36,7 @@ const el = {
   previewImageEl: $('preview-image-el'),
   customer: $('customer'),
   product: $('product'),
+  products: $('products'),
   shipDate: $('ship-date'),
   dateHint: $('date-hint'),
   message: $('message'),
@@ -105,6 +107,50 @@ function renderCarriers() {
       update();
     });
     el.carriers.appendChild(button);
+  });
+}
+
+/* -------------------------------------------------------------- 상품 목록 */
+
+function renderProducts() {
+  el.products.innerHTML = '';
+  PRODUCT_GROUPS.forEach((group) => {
+    const box = document.createElement('div');
+    box.className = 'products__group';
+
+    const label = document.createElement('span');
+    label.className = 'products__label';
+    label.textContent = group.label;
+    box.appendChild(label);
+
+    group.items.forEach((item) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip chip--product';
+      chip.textContent = item;
+      chip.dataset.item = item;
+      chip.setAttribute('aria-pressed', 'false');
+      chip.addEventListener('click', () => {
+        // 여러 개를 함께 보내는 경우가 많아서 눌렀다 뗐다 할 수 있게 했습니다.
+        el.product.value = toggleProduct(el.product.value, item);
+        syncProductChips();
+        update();
+      });
+      box.appendChild(chip);
+    });
+
+    el.products.appendChild(box);
+  });
+  syncProductChips();
+}
+
+/** 칸에 직접 적은 내용과 버튼 상태를 맞춥니다. */
+function syncProductChips() {
+  const text = el.product.value;
+  el.products.querySelectorAll('.chip--product').forEach((chip) => {
+    const on = isSelected(text, chip.dataset.item);
+    chip.classList.toggle('chip--on', on);
+    chip.setAttribute('aria-pressed', String(on));
   });
 }
 
@@ -280,6 +326,13 @@ function bind() {
       node.addEventListener(event, update)
     );
   });
+  el.product.addEventListener('input', syncProductChips);
+
+  // 입력을 마치면 택배사 표기 방식대로 끊어서 보기 좋게 정리합니다.
+  el.invoice.addEventListener('blur', () => {
+    const digits = digitsOnly(el.invoice.value);
+    if (digits) el.invoice.value = formatInvoice(digits, getCarrier(state.carrierId));
+  });
 
   el.message.addEventListener('input', () => {
     autoGrow(el.message);
@@ -355,6 +408,7 @@ function init() {
   if (!getCarrier(state.carrierId)) state.carrierId = CARRIERS[0].id;
   if (navigator.share) el.share.hidden = false;
   renderCarriers();
+  renderProducts();
   renderTokens();
   bind();
   update();

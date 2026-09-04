@@ -13,6 +13,14 @@ import {
 } from '../src/businessDays.js';
 import { digitsOnly, extractCandidates, formatInvoice, validateInvoice } from '../src/invoice.js';
 import {
+  ALL_PRODUCTS,
+  PRODUCT_GROUPS,
+  formatProducts,
+  isSelected,
+  parseProducts,
+  toggleProduct,
+} from '../src/products.js';
+import {
   DEFAULT_TEMPLATE,
   buildValues,
   collapseHolidayNames,
@@ -171,7 +179,7 @@ test('기본 문구가 완성된다', () => {
   const arrival = estimateArrival(shipDate, epost);
   const values = buildValues({
     customer: '김채아',
-    product: '힐링 아로마 세트',
+    product: '자격과정 교재',
     carrier: epost,
     invoiceDisplay: formatInvoice('1234567890123', epost),
     shipDateLong: formatLong(shipDate),
@@ -183,7 +191,7 @@ test('기본 문구가 완성된다', () => {
 
   assert.ok(message.includes('채아힐링센터'));
   assert.ok(message.includes('김채아님'));
-  assert.ok(message.includes('힐링 아로마 세트'));
+  assert.ok(message.includes('자격과정 교재'));
   assert.ok(message.includes('우체국택배'));
   assert.ok(message.includes('1234-5678-9012-3'));
   assert.ok(message.includes('2026년 9월 4일 (금)'));
@@ -263,6 +271,66 @@ test('추석 연휴를 낀 발송은 한 번만 언급한다', () => {
   );
   assert.ok(message.includes('배송 기간에 추석이 있어'));
   assert.equal(message.match(/추석/g).length, 1);
+});
+
+/* -------------------------------------------------------------- 상품 목록 */
+
+test('취급 품목이 모두 들어 있다', () => {
+  assert.deepEqual(ALL_PRODUCTS, [
+    '자격증',
+    '자격과정 교재',
+    '레인보우프리즘',
+    '컬러링코드',
+    '마인드 보석함',
+    '컬러테라피 교구재',
+    '아트테라피 재료',
+  ]);
+  assert.equal(PRODUCT_GROUPS.length, 3);
+});
+
+test('품목을 눌렀다 다시 누르면 빠진다', () => {
+  let text = '';
+  text = toggleProduct(text, '자격증');
+  assert.equal(text, '자격증');
+  text = toggleProduct(text, '컬러링코드');
+  assert.equal(text, '자격증, 컬러링코드');
+  text = toggleProduct(text, '자격증');
+  assert.equal(text, '컬러링코드');
+  text = toggleProduct(text, '컬러링코드');
+  assert.equal(text, '');
+});
+
+test('직접 적은 품목도 그대로 살린다', () => {
+  const text = toggleProduct('선물 포장', '마인드 보석함');
+  assert.equal(text, '선물 포장, 마인드 보석함');
+  assert.deepEqual(parseProducts(text), ['선물 포장', '마인드 보석함']);
+  assert.equal(isSelected(text, '마인드 보석함'), true);
+  assert.equal(isSelected(text, '컬러링코드'), false);
+});
+
+test('가운뎃점으로 적어도 나눠 읽는다', () => {
+  assert.deepEqual(parseProducts('자격증 · 컬러링코드'), ['자격증', '컬러링코드']);
+  assert.deepEqual(parseProducts('  '), []);
+  assert.equal(formatProducts(['자격증', '컬러링코드']), '자격증, 컬러링코드');
+});
+
+test('여러 품목이 메시지에 자연스럽게 들어간다', () => {
+  const shipDate = fromISODate('2026-09-04');
+  const arrival = estimateArrival(shipDate, epost);
+  const message = renderTemplate(
+    DEFAULT_TEMPLATE,
+    buildValues({
+      customer: '김채아',
+      product: toggleProduct(toggleProduct('', '컬러링코드'), '컬러테라피 교구재'),
+      carrier: epost,
+      invoiceDisplay: '1234-5678-9012-3',
+      shipDateLong: formatLong(shipDate),
+      arrivalText: arrival.text,
+      trackUrl: epost.trackUrl('1234567890123'),
+      holidayNames: [],
+    })
+  );
+  assert.ok(message.includes('주문해 주신 컬러링코드, 컬러테라피 교구재 상품이 발송되었습니다.'));
 });
 
 /* --------------------------------------------------------------- 결과 */

@@ -137,10 +137,11 @@ body {
   letter-spacing: 0.06em;
 }
 
+/* 상품명 버튼이 한 줄을 다 써야 해서 한 칸짜리 세로 배치로 둡니다. */
 .grid { display: grid; gap: 4px; }
 @media (min-width: 520px) {
-  .grid { grid-template-columns: 1fr 1fr; gap: 4px 12px; }
-  .grid .field:last-child { grid-column: 1 / -1; max-width: 240px; }
+  .grid #customer,
+  .grid #ship-date { max-width: 280px; }
 }
 
 .hint { margin: 2px 2px 0; font-size: 13px; color: var(--ink-soft); min-height: 1.2em; }
@@ -281,4 +282,25 @@ kbd {
   .card--result { background: var(--surface); }
   .btn--primary { color: #10201b; }
   kbd { background: var(--surface-muted); }
+}
+
+/* 품목 고르기 */
+.field--wide { grid-column: 1 / -1; }
+
+.products { display: grid; gap: 10px; margin-bottom: 8px; }
+.products__group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.products__label {
+  width: 100%;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-faint);
+}
+.chip--product { padding: 7px 12px; font-family: inherit; font-size: 14px; font-weight: 600; }
+.chip--on {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  .chip--on { color: #10201b; }
 }

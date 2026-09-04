@@ -6,6 +6,9 @@
 ## 할 수 있는 것
 
 - **택배사 3곳 선택** — 우체국택배 · GS Postbox 택배 · CU 편의점택배
+- **취급 품목 버튼 선택** — 자격증 · 자격과정 교재 · 컬러테라피 보드게임(레인보우프리즘 ·
+  컬러링코드 · 마인드 보석함) · 컬러테라피 교구재 · 아트테라피 재료
+  (여러 개를 함께 고를 수 있고, 목록에 없는 것은 직접 적어도 됩니다)
 - **송장번호 입력 2가지** — 직접 입력, 또는 캡쳐 이미지에서 자동 인식
   (사진 선택 · 끌어다 놓기 · <kbd>Ctrl</kbd>+<kbd>V</kbd> 붙여넣기 모두 됩니다)
 - **도착 예상일 자동 계산** — 주말과 공휴일을 뺀 영업일 기준
@@ -36,7 +39,7 @@ npm start          # http://localhost:4173
 
 ```
 안녕하세요, 채아힐링센터입니다 🌿
-김채아님, 주문해 주신 힐링 아로마 세트 상품이 발송되었습니다.
+김채아님, 주문해 주신 컬러링코드, 컬러테라피 교구재 상품이 발송되었습니다.
 
 📦 택배사 : 우체국택배
 🔢 송장번호 : 1234-5678-9012-3
@@ -56,6 +59,7 @@ https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?sid1=12345678901
 | 고치고 싶은 것 | 파일 |
 | --- | --- |
 | 택배사 이름 · 소요기간 · 조회 주소 · 송장 자릿수 | `src/carriers.js` |
+| 취급 품목 목록 | `src/products.js` |
 | 공휴일 (연도가 바뀌면 여기에 날짜 추가) | `src/holidays.js` |
 | 기본 안내 문구 | `src/message.js` 의 `DEFAULT_TEMPLATE` |
 | 화면 색·글씨 | `assets/style.css` |
@@ -90,6 +94,7 @@ npm start    # 개발 서버
 index.html            화면
 assets/style.css      스타일
 src/carriers.js       택배사 3곳 설정
+src/products.js       취급 품목 목록
 src/holidays.js       공휴일
 src/businessDays.js   영업일·도착 예상일 계산
 src/invoice.js        송장번호 정리·검증·후보 추출
